@@ -1,0 +1,50 @@
+[
+  {
+    "Id": 1,
+    "Name": "Lasso",
+    "Followers": 200000,
+    "Biography": "Lasso es un artistas venezolano",
+    "CreateDate": "2025-08-18T18:35:40.0381576+02:00",
+    "SoftDelete": false,
+    "Albums": [
+      {
+        "Id": 1,
+        "Name": "Verano",
+        "IdArtist": 1,
+        "ReleaseDate": "2020-09-08T00:00:00",
+        "Tracks": [],
+        "Duration": 0,
+        "SoftDelete": false
+      },
+      {
+        "Id": 2,
+        "Name": "Primavera",
+        "IdArtist": 1,
+        "ReleaseDate": "2020-09-03T00:00:00",
+        "Tracks": [
+          {
+            "Id": 1,
+            "Name": "Kamikase",
+            "IdAlbum": 2,
+            "IdArtist": 1,
+            "Duration": 120,
+            "ReleaseDate": "2020-09-04T00:00:00",
+            "Plays": 0,
+            "SoftDelete": false
+          }
+        ],
+        "Duration": 0,
+        "SoftDelete": false
+      },
+      {
+        "Id": 3,
+        "Name": "Invierno",
+        "IdArtist": 1,
+        "ReleaseDate": "2020-09-10T00:00:00",
+        "Tracks": [],
+        "Duration": 0,
+        "SoftDelete": false
+      }
+    ]
+  }
+]
