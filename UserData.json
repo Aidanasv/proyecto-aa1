@@ -1,0 +1,14 @@
+[
+  {
+    "Id": 1,
+    "Name": "Aidana Farfan",
+    "Username": "aidana09",
+    "Email": "aidanafarfan0908@gmail.com",
+    "Password": "0908",
+    "BirthDate": "2001-09-08T00:00:00",
+    "CreateDate": "2025-08-18T00:00:00+02:00",
+    "LastLogin": "2025-08-18T00:00:00+02:00",
+    "IsAdmin": 0,
+    "Playlists": []
+  }
+]
