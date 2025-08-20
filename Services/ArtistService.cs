@@ -12,5 +12,24 @@ public class ArtistService
         JsonStorage.SaveFile("datos.json", artists);
     }
 
+    public void UpdateArtist(Artist artist)
+    {
+        int index = artists.FindIndex(artistUpdated => artist.Id == artistUpdated.Id);
+        if (index != -1)
+        {
+            artists[index] = artist;
+            JsonStorage.SaveFile("datos.json", artists);
+        }
+    }
 
+    public void DeleteArtist(Artist artist)
+    {
+        int index = artists.FindIndex(artistUpdated => artist.Id == artistUpdated.Id);
+        if (index != -1)
+        {
+            artist.SoftDelete = true;
+            artists[index] = artist;
+            JsonStorage.SaveFile("datos.json", artists);
+        }
+    }
 }

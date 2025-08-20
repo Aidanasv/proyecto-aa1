@@ -1,11 +1,11 @@
 [
   {
     "Id": 1,
-    "Name": "Lasso",
-    "Followers": 200000,
+    "Name": "Lasso Nuevo",
+    "Followers": 250000,
     "Biography": "Lasso es un artistas venezolano",
     "CreateDate": "2025-08-18T18:35:40.0381576+02:00",
-    "SoftDelete": false,
+    "SoftDelete": true,
     "Albums": [
       {
         "Id": 1,
@@ -24,10 +24,10 @@
         "Tracks": [
           {
             "Id": 1,
-            "Name": "Kamikase",
+            "Name": "Kamikase 1",
             "IdAlbum": 2,
             "IdArtist": 1,
-            "Duration": 120,
+            "Duration": 200,
             "ReleaseDate": "2020-09-04T00:00:00",
             "Plays": 0,
             "SoftDelete": false

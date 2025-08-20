@@ -21,6 +21,31 @@ public class AlbumService
         );
         JsonStorage.SaveFile("datos.json", ArtistService.artists);
     }
+
+    public void UpdateAlbum(Album album)
+    {
+        int index = ArtistService.artists.FindIndex(artistUpdated => album.IdArtist == artistUpdated.Id);
+        if (index != -1)
+        {
+            int indexAlbum = ArtistService.artists[index].Albums.FindIndex(albumUpdate => album.Id == albumUpdate.Id);
+
+            ArtistService.artists[index].Albums[indexAlbum] = album;
+            JsonStorage.SaveFile("datos.json", ArtistService.artists);
+        }
+    }
+
+    public void DeleteAlbum(Album album)
+    {
+        int index = ArtistService.artists.FindIndex(artistUpdated => album.IdArtist == artistUpdated.Id);
+        if (index != -1)
+        {
+            int indexAlbum = ArtistService.artists[index].Albums.FindIndex(albumUpdate => album.Id == albumUpdate.Id);
+
+            album.SoftDelete = true;
+            ArtistService.artists[index].Albums[indexAlbum] = album;
+            JsonStorage.SaveFile("datos.json", ArtistService.artists);
+        }
+    }
     
     public List<Album> GetAlbums()
     {

@@ -63,16 +63,16 @@ public class UserMenu
         }
         else if (userService.currentUser.IsAdmin == 0)
         {
-            showAdminMenu();
+            ShowAdminMenu();
         }
         else
         {
-            showUserMenu();
+            ShowUserMenu();
         }
 
     }
 
-    public void showUserMenu()
+    public void ShowUserMenu()
     {
         bool isEnd = true;
 
@@ -117,7 +117,7 @@ public class UserMenu
         }
     }
 
-    public void showAdminMenu()
+    public void ShowAdminMenu()
     {
         bool isEnd = true;
 
@@ -125,11 +125,9 @@ public class UserMenu
             {
                 { 1, "🎤 Ver todos los artistas" },
                 { 2, "➕ Crear nuevo artista" },
-                { 3, "💿 Ver todos los álbumes" },
-                { 4, "🆕 Crear nuevo álbum"},
-                { 5, "🎵 Crear nueva canción"},
-                { 6, "🗑️ Eliminar artista / álbum / canción"},
-                { 7, "🔙 Cerrar sesión"}
+                { 3, "🆕 Crear nuevo álbum"},
+                { 4, "🎵 Crear nueva canción"},
+                { 5, "🔙 Cerrar sesión"}
             };
 
         while (isEnd)
@@ -145,23 +143,18 @@ public class UserMenu
             switch (opcion)
             {
                 case 1:
-                    artistMenu.showArtists();
+                    artistMenu.ShowArtists();
                     break;
                 case 2:
                     artistMenu.Register();
                     break;
                 case 3:
-                    albumMenu.showAlbums();
-                    break;
-                case 4:
                     albumMenu.Register();
                     break;
-                case 5:
+                case 4:
                     trackMenu.Register();
                     break;
-                case 6:
-                    break;
-                case 7:
+                case 5:
                     break;
             }
         }
