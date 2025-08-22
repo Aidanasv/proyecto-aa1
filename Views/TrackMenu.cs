@@ -31,6 +31,25 @@ public class TrackMenu
         ActionsToTrack(opcionTrack);
     }
 
+    public void ShowTracksByPlaylists(Playlist playlist)
+    {
+        var tracks = playlist.Tracks.ToList();
+        var back = new Track { Id = -1, Name = "🔙 Volver al menú anterior" };
+        tracks.Add(back);
+
+        Track opcionTrack = AnsiConsole.Prompt(
+                new SelectionPrompt<Track>()
+                    .Title("[bold underline green] LISTA DE CANCIONES[/]")
+                    .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
+                    .AddChoices(tracks)
+                    .UseConverter(choice => $"🎵 {choice.Name}"));
+
+        if (opcionTrack.Id == -1)
+        {
+            return;
+        }
+    }
+
     public void ShowTrackDetails(Track track)
     {
         var details = new Panel(

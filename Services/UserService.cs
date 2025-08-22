@@ -21,7 +21,6 @@ public class UserService
     public void SearchUser(string username, string password)
     {
         User? user = users.Find(user => user.Username == username && user.Password == password);
-        Console.WriteLine(user?.Email);
         this.currentUser = user;
     }
 }

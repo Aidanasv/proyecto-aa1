@@ -12,6 +12,7 @@ public class UserMenu
     private ArtistMenu artistMenu = new();
     private AlbumMenu albumMenu = new();
     private TrackMenu trackMenu = new();
+    private PlaylistMenu playlistMenu = new();
     public void Register()
     {
         AnsiConsole.MarkupLine("[bold underline green]Registrar Usuario:[/]");
@@ -55,6 +56,7 @@ public class UserMenu
         var Username = AnsiConsole.Ask<string>("Introduce tu nombre de usuario: ");
         var Password = AnsiConsole.Ask<string>("Introduce tu contraseña: ");
 
+        AnsiConsole.Clear();
         userService.SearchUser(Username, Password);
 
         if (userService.currentUser is null)
@@ -69,7 +71,6 @@ public class UserMenu
         {
             ShowUserMenu();
         }
-
     }
 
     public void ShowUserMenu()
@@ -80,11 +81,8 @@ public class UserMenu
             {
                 { 1, "📂 Ver mis playlists" },
                 { 2, "➕ Crear nueva playlist" },
-                { 3, "🎵 Agregar canciones a una playlist" },
-                { 4, "📃 Ver canciones de una playlist"},
-                { 5, "🗑️ Eliminar una playlist"},
-                { 6, "👤 Editar mi perfil"},
-                { 7, "🔙 Cerrar sesión"}
+                { 3, "👤 Editar mi perfil"},
+                { 4, "🔙 Cerrar sesión"}
             };
 
         while (isEnd)
@@ -100,18 +98,14 @@ public class UserMenu
             switch (opcion)
             {
                 case 1:
+                    playlistMenu.ShowPlaylistsByUser(userService.currentUser);
                     break;
                 case 2:
+                    playlistMenu.CreatePlaylist(userService.currentUser);
                     break;
                 case 3:
                     break;
                 case 4:
-                    break;
-                case 5:
-                    break;
-                case 6:
-                    break;
-                case 7:
                     break;
             }
         }
