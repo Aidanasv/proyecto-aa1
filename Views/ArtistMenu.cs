@@ -11,26 +11,33 @@ public class ArtistMenu
     private AlbumMenu albumMenu = new();
 
     //Mostrar todos los artistas
-    public void ShowArtists()
+    public void ShowArtists(string? name = null)
     {
-        var artists = ArtistService.artists.ToList();
-        var back = new Artist { Id = -1, Name = "🔙 Volver al menú anterior" };
-        artists.Add(back);
 
-        Artist opcionArtist = AnsiConsole.Prompt(
+        var artists = ArtistService.artists.Where(artist => name is null || artist.Name.ToLower().Contains(name.ToLower())).ToList();
+        var back = new Artist { Id = -1, Name = "🔙 Volver" };
+        artists.Add(back);
+        var isEnd = true;
+
+        do
+        {
+            AnsiConsole.Clear();
+            Artist opcionArtist = AnsiConsole.Prompt(
                 new SelectionPrompt<Artist>()
                     .Title("[bold underline green] LISTA DE ARTISTAS[/]")
                     .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
                     .AddChoices(artists)
                     .UseConverter(choice => $"{choice.Name}"));
 
-        if (opcionArtist.Id == -1)
-        {
-            AnsiConsole.MarkupLine("[yellow]Volviendo al menú anterior...[/]");
-            return;
-        }
-
-        ActionsToArtists(opcionArtist);
+            if (opcionArtist.Id == -1)
+            {
+                isEnd = false;
+            }
+            else
+            {
+                ActionsToArtists(opcionArtist);
+            }
+        } while (isEnd);
     }
 
     //Mostrar el detalle del artista seleccionado
@@ -59,7 +66,6 @@ public class ArtistMenu
     public void ActionsToArtists(Artist artist)
     {
         bool isEnd = true;
-
         var opcions = new Dictionary<int, string>
             {
                 { 1, "✏️ Modificar" },
@@ -67,6 +73,15 @@ public class ArtistMenu
                 { 3, "📀 Ver álbumes" },
                 { 4, "🔙 Volver"},
             };
+
+        if (UserService.currentUser == null || UserService.currentUser.IsAdmin == 1)
+        {
+            opcions = new Dictionary<int, string>
+            {
+                { 3, "📀 Ver álbumes" },
+                { 4, "🔙 Volver"},
+            };
+        }
 
         while (isEnd)
         {
@@ -119,8 +134,12 @@ public class ArtistMenu
             Albums = []
         };
         artistService.AddArtist(artist);
+        AnsiConsole.MarkupLine("[green]✅ Artista registrado correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Modificar artista
     public void Update(Artist artist)
     {
         artist.Name = AnsiConsole.Ask<string>("Nuevo nombre:", artist.Name);
@@ -129,9 +148,14 @@ public class ArtistMenu
         artist.SoftDelete = !AnsiConsole.Confirm("¿Activo?", !artist.SoftDelete);
 
         artistService.UpdateArtist(artist);
+        
+        AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[green]✅ Artista modificado correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Eliminar artista
     public void Delete(Artist artist)
     {
         bool confirm = AnsiConsole.Confirm($"¿Seguro que deseas eliminar a [red]{artist.Name}[/]?");
@@ -140,10 +164,14 @@ public class ArtistMenu
         {
             artistService.DeleteArtist(artist);
             AnsiConsole.MarkupLine("[red]🗑️ Artista eliminado.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
         else
         {
             AnsiConsole.MarkupLine("[yellow]🚫 Acción cancelada por el usuario.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
     }
 

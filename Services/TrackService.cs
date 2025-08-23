@@ -1,6 +1,7 @@
 namespace Services;
 
-using System.Security.Cryptography;
+using System.Net.Http;
+using System.Text.Json;
 using Models;
 using Utils;
 
@@ -70,5 +71,29 @@ public class TrackService
     {
         //Obtiene todos los arrays de los albumes y las canciones y los convierte en un unico array.
         return ArtistService.artists.SelectMany(artist => artist.Albums.SelectMany(album => album.Tracks)).ToList();
+    }
+
+    public async Task<string?> GetTrackFromAPI(string trackName)
+    {
+        try
+        {
+            HttpClient client = new HttpClient();
+
+            string url = "https://api.deezer.com/search?q=" + trackName;
+            string responseBody = await client.GetStringAsync(url);
+            DataApi dataApi = JsonSerializer.Deserialize<DataApi>(responseBody);
+            string urlaudio = dataApi.data[0].preview;
+            var audiobytes = await client.GetByteArrayAsync(urlaudio);
+            string filePath = Path.Combine("Previews", $"{trackName}.mp3");
+            await File.WriteAllBytesAsync(filePath, audiobytes);
+
+
+            return filePath;
+        }
+        catch
+        {
+            return null;
+        }
+
     }
 }

@@ -7,6 +7,8 @@ using Spectre.Console;
 public class MainMenu
 {
     private UserMenu userMenu = new();
+
+    //Menu principal
     public void Show()
     {
         var title = new FigletText("Música")
@@ -44,6 +46,7 @@ public class MainMenu
                     userMenu.Register();
                     break;
                 case 3:
+                    userMenu.ShowPublicZone();
                     break;
                 case 4:
                     isEnd = false;

@@ -3,39 +3,50 @@ namespace Utils;
 using Models;
 using Services;
 using Spectre.Console;
+using System.Threading;
 
 public class AlbumMenu
 {
     private AlbumService albumService = new();
     private TrackMenu trackMenu = new();
 
+    //Mostrar albumes segun artista
     public void ShowAlbumsByArtist(Artist artist)
     {
         if (artist.Albums == null || artist.Albums.Count == 0)
-    {
-        AnsiConsole.MarkupLine($"[red]❌ El artista [bold]{artist.Name}[/] no tiene álbumes registrados.[/]");
-        return;
-    }
+        {
+            AnsiConsole.MarkupLine($"[red]❌ El artista [bold]{artist.Name}[/] no tiene álbumes registrados.[/]");
+            Thread.Sleep(2000);
+            return;
+        }
 
         var albums = artist.Albums.ToList();
         var back = new Album { Id = -1, Name = "🔙 Volver" };
         albums.Add(back);
+        var isEnd = true;
 
-        Album opcionAlbum = AnsiConsole.Prompt(
-                 new SelectionPrompt<Album>()
-                     .Title($"[bold underline green] ÁLBUMES DE {artist.Name.ToUpper()} [/]")
-                     .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
-                     .AddChoices(albums)
-                     .UseConverter(choice => $"{choice.Name}"));
-
-        if (opcionAlbum.Id == -1)
+        do
         {
-            return;
-        }
+            Album opcionAlbum = AnsiConsole.Prompt(
+                  new SelectionPrompt<Album>()
+                      .Title($"[bold underline green] ÁLBUMES DE {artist.Name.ToUpper()} [/]")
+                      .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
+                      .AddChoices(albums)
+                      .UseConverter(choice => $"{choice.Name}"));
 
-        ActionsToAlbums(opcionAlbum);
+            if (opcionAlbum.Id == -1)
+            {
+                isEnd = false;
+            }
+            else
+            {
+                ActionsToAlbums(opcionAlbum);
+            }
+
+        } while (isEnd);
     }
 
+    //Mostrar detalle de albumes
     public void ShowAlbumDetails(Album album)
     {
         var details = new Panel(
@@ -56,6 +67,7 @@ public class AlbumMenu
         AnsiConsole.Write(details);
     }
 
+    //Acciones para albumes
     public void ActionsToAlbums(Album album)
     {
         bool isEnd = true;
@@ -68,10 +80,19 @@ public class AlbumMenu
                 { 4, "🔙 Volver"},
             };
 
+        if (UserService.currentUser == null || UserService.currentUser.IsAdmin == 1)
+        {
+            opcions = new Dictionary<int, string>
+            {
+                { 3, "📀 Ver canciones" },
+                { 4, "🔙 Volver"},
+            };
+        }
+
         while (isEnd)
         {
             AnsiConsole.Clear();
-            
+
             ShowAlbumDetails(album);
 
             int opcion = AnsiConsole.Prompt(
@@ -99,13 +120,22 @@ public class AlbumMenu
         }
     }
 
+    //Registrar album nuevo
     public void Register()
     {
         AnsiConsole.MarkupLine("[bold underline green]Registrar Album:[/]");
         AnsiConsole.WriteLine();
 
+        if (ArtistService.artists.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"[red]❌ Debe agregar algún artista antes.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
+            return;
+        }
+
         var Name = AnsiConsole.Ask<string>("Introduce el nombre del Album: ");
-        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento: ");
+        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento (mm/dd/aaaa): ");
         Artist opcion = AnsiConsole.Prompt(
             new SelectionPrompt<Artist>()
                 .Title("[bold underline green] LISTA DE ARTISTAS[/]")
@@ -127,17 +157,21 @@ public class AlbumMenu
         albumService.AddAlbum(album);
     }
 
+    //Modificar albúm
     public void Update(Album album)
     {
         album.Name = AnsiConsole.Ask<string>("Nuevo nombre:", album.Name);
         album.Duration = AnsiConsole.Ask<int>("Nueva duración:", album.Duration);
-        album.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento:", album.ReleaseDate);
+        album.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento (mm/dd/aaaa):", album.ReleaseDate);
         album.SoftDelete = !AnsiConsole.Confirm("¿Activo?", !album.SoftDelete);
 
         albumService.UpdateAlbum(album);
         AnsiConsole.MarkupLine("[green]✅ Álbum modificado correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Eliminar album 
     public void Delete(Album album)
     {
         bool confirm = AnsiConsole.Confirm($"¿Seguro que deseas eliminar a [red]{album.Name}[/]?");
@@ -146,10 +180,14 @@ public class AlbumMenu
         {
             albumService.DeleteAlbum(album);
             AnsiConsole.MarkupLine("[red]🗑️ Álbum eliminado.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
         else
         {
             AnsiConsole.MarkupLine("[yellow]🚫 Acción cancelada por el usuario.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
     }
 }

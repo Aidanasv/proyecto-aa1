@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Models;
 
 public class Track
@@ -8,6 +10,7 @@ public class Track
     public int IdArtist { get; set; }
     public int Duration { get; set; }
     public DateTime ReleaseDate { get; set; }
+    public string Link { get; set; }
     public int Plays { get; set; }
     public bool SoftDelete { get; set; }
 
