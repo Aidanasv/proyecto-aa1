@@ -1,6 +1,5 @@
 namespace Utils;
 
-using Microsoft.VisualBasic.FileIO;
 using Models;
 using Services;
 using Spectre.Console;
@@ -9,47 +8,76 @@ public class TrackMenu
 {
     private TrackService trackService = new();
 
+    //Mostrar canciones por albúm
     public void ShowTracksByAlbum(Album album)
     {
         var tracks = album.Tracks.ToList();
-        var back = new Track { Id = -1, Name = "🔙 Volver al menú anterior" };
+        var back = new Track { Id = -1, Name = "🔙 Volver" };
         tracks.Add(back);
+        var isEnd = true;
 
-
-        Track opcionTrack = AnsiConsole.Prompt(
+        do
+        {
+            Track opcionTrack = AnsiConsole.Prompt(
                 new SelectionPrompt<Track>()
                     .Title("[bold underline green] LISTA DE CANCIONES[/]")
                     .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
                     .AddChoices(tracks)
                     .UseConverter(choice => $"🎵 {choice.Name}"));
 
-        if (opcionTrack.Id == -1)
-        {
-            return;
-        }
+            if (opcionTrack.Id == -1)
+            {
+                isEnd = false;
+            }
+            else
+            {
+                ActionsToTrack(opcionTrack);
+            }
+        } while (isEnd);
+        AnsiConsole.Clear();
 
-        ActionsToTrack(opcionTrack);
     }
 
+    //Mostrar canciones por playlist
     public void ShowTracksByPlaylists(Playlist playlist)
     {
+
         var tracks = playlist.Tracks.ToList();
-        var back = new Track { Id = -1, Name = "🔙 Volver al menú anterior" };
+        var back = new Track { Id = -1, Name = "🔙 Volver" };
         tracks.Add(back);
 
-        Track opcionTrack = AnsiConsole.Prompt(
+        var isEnd = true;
+
+        do
+        {
+            Track opcionTrack = AnsiConsole.Prompt(
                 new SelectionPrompt<Track>()
                     .Title("[bold underline green] LISTA DE CANCIONES[/]")
                     .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
                     .AddChoices(tracks)
                     .UseConverter(choice => $"🎵 {choice.Name}"));
 
-        if (opcionTrack.Id == -1)
-        {
-            return;
-        }
+            if (opcionTrack.Id == -1)
+            {
+                isEnd = false;
+            }
+            else
+            {
+                string previewUrl = opcionTrack.Link;
+                if (previewUrl != null)
+                {
+                    AudioPlayer.PlayAsync(previewUrl).GetAwaiter();
+
+                    Console.WriteLine("Presiona una tecla para detener...");
+                    Console.ReadKey();
+
+                    AudioPlayer.Stop();
+                }
+            }
+        } while (isEnd);
     }
 
+    //Mostrar detalles de canciones
     public void ShowTrackDetails(Track track)
     {
         var details = new Panel(
@@ -71,6 +99,7 @@ public class TrackMenu
         AnsiConsole.Write(details);
     }
 
+    //Acciones para canciones
     public void ActionsToTrack(Track track)
     {
         bool isEnd = true;
@@ -82,6 +111,16 @@ public class TrackMenu
                 { 3, "🗑️ Eliminar" },
                 { 4, "🔙 Volver"},
             };
+
+        //si el usuario actual es nulo o no es admin solo se muestran estas opciones
+        if (UserService.currentUser == null || UserService.currentUser.IsAdmin == 1)
+        {
+            opcions = new Dictionary<int, string>
+            {
+                { 1, "▶️ Reproducir" },
+                { 4, "🔙 Volver"},
+            };
+        }
 
         while (isEnd)
         {
@@ -99,6 +138,16 @@ public class TrackMenu
             switch (opcion)
             {
                 case 1:
+                    string previewUrl = track.Link;
+                    if (previewUrl != null)
+                    {
+                        AudioPlayer.PlayAsync(previewUrl).GetAwaiter();
+
+                        Console.WriteLine("Presiona una tecla para detener...");
+                        Console.ReadKey();
+
+                        AudioPlayer.Stop();
+                    }
                     break;
                 case 2:
                     Update(track);
@@ -113,6 +162,7 @@ public class TrackMenu
         }
     }
 
+    //Registrar nueva canción
     public void Register()
     {
         AnsiConsole.MarkupLine("[bold underline green]Registrar Canción:[/]");
@@ -120,7 +170,9 @@ public class TrackMenu
 
         var Name = AnsiConsole.Ask<string>("Introduce el nombre de la Canción: ");
         var Duration = AnsiConsole.Ask<int>("Introduce la duración de la Canción: ");
-        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento: ");
+        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento (mm/dd/aaaa): ");
+        AnsiConsole.WriteLine();
+
         Artist opcionArtist = AnsiConsole.Prompt(
             new SelectionPrompt<Artist>()
                 .Title("[bold underline green] LISTA DE ARTISTAS[/]")
@@ -128,12 +180,29 @@ public class TrackMenu
                 .AddChoices(ArtistService.artists)
                 .UseConverter(choice => $"{choice.Name}"));
 
+        if (opcionArtist.Albums.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"[red]❌ Debe agregar algún albúm al artista.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
+            return;
+        }
+
         Album opcionAlbum = AnsiConsole.Prompt(
             new SelectionPrompt<Album>()
                 .Title("[bold underline green] LISTA DE ALBUMES[/]")
                 .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
                 .AddChoices(opcionArtist.Albums)
                 .UseConverter(choice => $"{choice.Name}"));
+
+        string? url = trackService.GetTrackFromAPI(Name + " " + opcionArtist.Name).Result;
+        if (url == null)
+        {
+            AnsiConsole.MarkupLine($"[red]❌ Error al buscar pista de la canción.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
+            return;
+        }
 
         Track track = new Track
         {
@@ -143,23 +212,31 @@ public class TrackMenu
             IdAlbum = opcionAlbum.Id,
             Duration = Duration,
             ReleaseDate = ReleaseDate,
+            Link = url,
             Plays = 0,
             SoftDelete = false,
         };
         trackService.AddTrack(track);
+        AnsiConsole.MarkupLine("[green]✅ Canción registrada correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
-    
+
+    //Modificar canción
     public void Update(Track track)
     {
         track.Name = AnsiConsole.Ask<string>("Nuevo nombre:", track.Name);
         track.Duration = AnsiConsole.Ask<int>("Nueva duración:", track.Duration);
-        track.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento:", track.ReleaseDate);
+        track.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento (mm/dd/aaaa):", track.ReleaseDate);
         track.SoftDelete = !AnsiConsole.Confirm("¿Activo?", !track.SoftDelete);
 
         trackService.UpdateTrack(track);
         AnsiConsole.MarkupLine("[green]✅ Canción modificada correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Eliminar canción
     public void Delete(Track track)
     {
         bool confirm = AnsiConsole.Confirm($"¿Seguro que deseas eliminar a [red]{track.Name}[/]?");
@@ -168,10 +245,14 @@ public class TrackMenu
         {
             trackService.DeleteTrack(track);
             AnsiConsole.MarkupLine("[red]🗑️ Canción eliminada.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
         else
         {
             AnsiConsole.MarkupLine("[yellow]🚫 Acción cancelada por el usuario.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
     }
 

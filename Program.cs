@@ -12,7 +12,6 @@ if (ArtistData != null)
 var UserData = JsonStorage.LoadFile<List<User>>("UserData.json");
 if (UserData != null)
 {
-    Console.WriteLine("Hola llegué aqui");
     UserService.users = UserData;
 }
 

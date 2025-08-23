@@ -3,7 +3,6 @@ namespace Views;
 using Models;
 using Services;
 using Spectre.Console;
-using Spectre.Console.Rendering;
 using Utils;
 
 public class PlaylistMenu
@@ -12,12 +11,14 @@ public class PlaylistMenu
     private TrackMenu trackMenu = new();
     private TrackService trackService = new();
 
-
+    //Mostrar playlists segun el usuario
     public void ShowPlaylistsByUser(User user)
     {
         if (user.Playlists == null || user.Playlists.Count == 0)
         {
             AnsiConsole.MarkupLine($"[red]❌ No tienes playlists creadas.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
             return;
         }
 
@@ -27,7 +28,7 @@ public class PlaylistMenu
 
         Playlist opcionPlaylist = AnsiConsole.Prompt(
                  new SelectionPrompt<Playlist>()
-                     .Title($"[bold underline green] PlAYLISTS DE {user.Name.ToUpper()} [/]")
+                     .Title($"[bold underline green] PLAYLISTS DE {user.Name.ToUpper()} [/]")
                      .MoreChoicesText("[grey](Mueve de arriba hacia abajo para seleccionar tu opción)[/]")
                      .AddChoices(playlists)
                      .UseConverter(choice => $"{choice.Name}"));
@@ -40,6 +41,7 @@ public class PlaylistMenu
         ActionsToPlaylists(opcionPlaylist);
     }
 
+    //Mostrar detalles de playlists
     public void ShowPlaylistDetails(Playlist playlist)
     {
         var details = new Panel(
@@ -58,6 +60,7 @@ public class PlaylistMenu
         AnsiConsole.Write(details);
     }
 
+    //Acciones de playllists
     public void ActionsToPlaylists(Playlist playlist)
     {
         bool isEnd = true;
@@ -109,6 +112,7 @@ public class PlaylistMenu
         }
     }
 
+    //Crear playlists
     public void CreatePlaylist(User user)
     {
         AnsiConsole.MarkupLine("[bold underline green]Crear nueva Playlist:[/]");
@@ -127,8 +131,12 @@ public class PlaylistMenu
             Tracks = []
         };
         playlistService.AddPlaylist(user, playlist);
+        AnsiConsole.MarkupLine("[green]✅ Playlist creada correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Actualizar playlist
     public void Update(Playlist playlist)
     {
         playlist.Name = AnsiConsole.Ask<string>("Nuevo nombre:", playlist.Name);
@@ -137,8 +145,11 @@ public class PlaylistMenu
 
         playlistService.UpdatePlaylist(playlist);
         AnsiConsole.MarkupLine("[green]✅ Playlist modificada correctamente.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 
+    //Eliminar playlist
     public bool Delete(Playlist playlist)
     {
         bool confirm = AnsiConsole.Confirm($"¿Seguro que deseas eliminar [red]{playlist.Name}[/]?");
@@ -147,19 +158,24 @@ public class PlaylistMenu
         {
             playlistService.DeletePlaylist(playlist);
             AnsiConsole.MarkupLine("[red]🗑️ Playlist eliminada.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
         else
         {
             AnsiConsole.MarkupLine("[yellow]🚫 Acción cancelada por el usuario.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
 
         return confirm;
     }
 
+    //Añadir canciones a la playlists
     public void AddTracksToPlaylist(Playlist playlist)
     {
         var tracks = trackService.GetTracks().ToList();
-        var back = new Track { Id = -1, Name = "🔙 Volver al menú anterior" };
+        var back = new Track { Id = -1, Name = "🔙 Volver" };
         tracks.Add(back);
 
         Track opcionTrack = AnsiConsole.Prompt(
@@ -175,5 +191,8 @@ public class PlaylistMenu
         }
 
         playlistService.AddTrackToPlaylist(opcionTrack, playlist);
+        AnsiConsole.MarkupLine("[green]✅ Canción agregada a la playlist.[/]");
+        Thread.Sleep(2000);
+        AnsiConsole.Clear();
     }
 }
