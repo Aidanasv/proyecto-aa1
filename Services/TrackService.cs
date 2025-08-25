@@ -2,6 +2,7 @@ namespace Services;
 
 using System.Net.Http;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Models;
 using Utils;
 
@@ -20,7 +21,8 @@ public class TrackService
                          {
                              if (album.Id == track.IdAlbum)
                              {
-                                 album.Tracks.Add(track);
+                                album.Tracks.Add(track);
+                                Logger.LoggerApp.LogInformation("🚀 Canción añadida");
                              }
                          }
                      );
@@ -43,6 +45,7 @@ public class TrackService
             {
                 int indexTrack = ArtistService.artists[index].Albums[indexAlbum].Tracks.FindIndex(trackUpdated => track.Id == trackUpdated.Id);
                 ArtistService.artists[index].Albums[indexAlbum].Tracks[indexTrack] = track;
+                Logger.LoggerApp.LogInformation("🚀 Cancion modificada");
                 JsonStorage.SaveFile("datos.json", ArtistService.artists);
             }
         }
@@ -60,6 +63,7 @@ public class TrackService
                 int indexTrack = ArtistService.artists[index].Albums[indexAlbum].Tracks.FindIndex(trackUpdated => track.Id == trackUpdated.Id);
                 track.SoftDelete = true;
                 ArtistService.artists[index].Albums[indexAlbum].Tracks[indexTrack] = track;
+                Logger.LoggerApp.LogInformation("🚀 Canción eliminada");
                 JsonStorage.SaveFile("datos.json", ArtistService.artists);
             }
 
@@ -70,6 +74,7 @@ public class TrackService
     public List<Track> GetTracks()
     {
         //Obtiene todos los arrays de los albumes y las canciones y los convierte en un unico array.
+        Logger.LoggerApp.LogInformation("🚀 Usuarios obtenidos");
         return ArtistService.artists.SelectMany(artist => artist.Albums.SelectMany(album => album.Tracks)).ToList();
     }
 
@@ -84,14 +89,20 @@ public class TrackService
             DataApi dataApi = JsonSerializer.Deserialize<DataApi>(responseBody);
             string urlaudio = dataApi.data[0].preview;
             var audiobytes = await client.GetByteArrayAsync(urlaudio);
-            string filePath = Path.Combine("Previews", $"{trackName}.mp3");
-            await File.WriteAllBytesAsync(filePath, audiobytes);
+            var nameClear = trackName.Replace(" ","");
+            string filePath = Path.Combine("Previews", $"{nameClear}.mp3");
 
+            var previewsPath = Environment.GetEnvironmentVariable("DATA_PATH") ?? "/app/data/data";
+            Directory.CreateDirectory(previewsPath + "/Previews");
 
-            return filePath;
+            await File.WriteAllBytesAsync(previewsPath + "/" + filePath , audiobytes);
+
+            Logger.LoggerApp.LogInformation("🚀 Url obtenida");
+            return previewsPath + "/" + filePath;
         }
-        catch
+        catch (Exception ex)
         {
+            Logger.LoggerApp.LogError("🚀 Error al obtener url: " + ex.Message);
             return null;
         }
 
