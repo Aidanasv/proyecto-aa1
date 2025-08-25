@@ -168,6 +168,15 @@ public class TrackMenu
         AnsiConsole.MarkupLine("[bold underline green]Registrar Canción:[/]");
         AnsiConsole.WriteLine();
 
+        if (ArtistService.artists.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"[red]❌ Debe agregar algún artista antes.[/]");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
+            return;
+        } 
+        
+
         var Name = AnsiConsole.Ask<string>("Introduce el nombre de la Canción: ");
         var Duration = AnsiConsole.Ask<int>("Introduce la duración de la Canción: ");
         var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento (mm/dd/aaaa): ");

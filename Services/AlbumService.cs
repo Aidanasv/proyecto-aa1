@@ -1,5 +1,6 @@
 namespace Services;
 
+using Microsoft.Extensions.Logging;
 using Models;
 using Utils;
 
@@ -16,6 +17,7 @@ public class AlbumService
                 if (artist.Id == album.IdArtist)
                 {
                     artist.Albums.Add(album);
+                    Logger.LoggerApp.LogInformation("🚀 Album añadido");
                 }
             }
         );
@@ -30,6 +32,7 @@ public class AlbumService
             int indexAlbum = ArtistService.artists[index].Albums.FindIndex(albumUpdate => album.Id == albumUpdate.Id);
 
             ArtistService.artists[index].Albums[indexAlbum] = album;
+            Logger.LoggerApp.LogInformation("🚀 Album modificado");
             JsonStorage.SaveFile("datos.json", ArtistService.artists);
         }
     }
@@ -43,6 +46,7 @@ public class AlbumService
 
             album.SoftDelete = true;
             ArtistService.artists[index].Albums[indexAlbum] = album;
+            Logger.LoggerApp.LogInformation("🚀 Album eliminado");
             JsonStorage.SaveFile("datos.json", ArtistService.artists);
         }
     }

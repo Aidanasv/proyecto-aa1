@@ -1,5 +1,6 @@
 namespace Services;
 
+using Microsoft.Extensions.Logging;
 using Models;
 using Utils;
 
@@ -14,6 +15,7 @@ public class PlaylistService
                 if (user.Id == userInList.Id)
                 {
                     userInList.Playlists.Add(playlist);
+                    Logger.LoggerApp.LogInformation("🚀 Playlist añadida");
                 }
             }
         );
@@ -28,6 +30,7 @@ public class PlaylistService
             int indexPlaylist = UserService.users[index].Playlists.FindIndex(playlistUpdated => playlist.Id == playlistUpdated.Id);
 
             UserService.users[index].Playlists[indexPlaylist] = playlist;
+            Logger.LoggerApp.LogInformation("🚀 Playlist actualizada");
             JsonStorage.SaveFile("UserData.json", UserService.users);
         } 
     }
@@ -40,6 +43,7 @@ public class PlaylistService
             int indexPlaylist = UserService.users[index].Playlists.FindIndex(playlistUpdated => playlist.Id == playlistUpdated.Id);
 
             UserService.users[index].Playlists.RemoveAt(indexPlaylist);
+            Logger.LoggerApp.LogInformation("🚀 Playlist eiminada");
             JsonStorage.SaveFile("UserData.json", UserService.users);
         }
     }
@@ -50,6 +54,7 @@ public class PlaylistService
         if (searchTrack == -1)
         {
             playlist.Tracks.Add(track);
+            Logger.LoggerApp.LogInformation("🚀 Canción añadida a la playlist");
             UpdatePlaylist(playlist);
         }
     }
@@ -57,6 +62,8 @@ public class PlaylistService
     public List<Playlist> GetPlaylists()
     {
         //Obtiene todos los arrays de las playlist y los convierte en un unico array
+        Logger.LoggerApp.LogInformation("🚀 Playlist obtenidas");
         return UserService.users.SelectMany(user => user.Playlists).ToList();
+        
     }
 }

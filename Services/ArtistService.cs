@@ -1,5 +1,6 @@
 namespace Services;
 
+using Microsoft.Extensions.Logging;
 using Models;
 using Utils;
 
@@ -9,6 +10,7 @@ public class ArtistService
     public void AddArtist(Artist artist)
     {
         artists.Add(artist);
+        Logger.LoggerApp.LogInformation("🚀 Artista añadido");
         JsonStorage.SaveFile("datos.json", artists);
     }
 
@@ -18,6 +20,7 @@ public class ArtistService
         if (index != -1)
         {
             artists[index] = artist;
+            Logger.LoggerApp.LogInformation("🚀 Artista modificado");
             JsonStorage.SaveFile("datos.json", artists);
         }
     }
@@ -29,6 +32,7 @@ public class ArtistService
         {
             artist.SoftDelete = true;
             artists[index] = artist;
+            Logger.LoggerApp.LogInformation("🚀 Artista eliminado");
             JsonStorage.SaveFile("datos.json", artists);
         }
     }
