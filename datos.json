@@ -1,0 +1,33 @@
+[
+  {
+    "Id": 1,
+    "Name": "Lasso",
+    "Followers": 250000,
+    "Biography": "Lasso es un artista venezolano",
+    "CreateDate": "2025-08-23T23:59:42.6901977+02:00",
+    "SoftDelete": false,
+    "Albums": [
+      {
+        "Id": 1,
+        "Name": "Malcriado",
+        "IdArtist": 1,
+        "ReleaseDate": "2024-09-02T00:00:00",
+        "Tracks": [
+          {
+            "Id": 1,
+            "Name": "Fetiche",
+            "IdAlbum": 1,
+            "IdArtist": 1,
+            "Duration": 200,
+            "ReleaseDate": "2024-01-02T00:00:00",
+            "Link": "Previews\\Fetiche Lasso.mp3",
+            "Plays": 0,
+            "SoftDelete": false
+          }
+        ],
+        "Duration": 200,
+        "SoftDelete": false
+      }
+    ]
+  }
+]

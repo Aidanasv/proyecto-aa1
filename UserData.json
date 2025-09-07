@@ -1,0 +1,38 @@
+[
+  {
+    "Id": 1,
+    "Name": "Aidana Farfan",
+    "Username": "aidana09",
+    "Email": "aidanafarfan0908@gmail.com",
+    "Password": "0908",
+    "BirthDate": "2001-08-09T00:00:00",
+    "CreateDate": "2025-08-23T00:00:00+02:00",
+    "LastLogin": "2025-08-23T00:00:00+02:00",
+    "IsAdmin": 0,
+    "Playlists": []
+  },
+  {
+    "Id": 2,
+    "Name": "Aidana Paola",
+    "Username": "aidana08",
+    "Email": "farfanaidana0908@gmail.com",
+    "Password": "0908",
+    "BirthDate": "2001-08-09T00:00:00",
+    "CreateDate": "2025-08-23T00:00:00+02:00",
+    "LastLogin": "2025-08-23T00:00:00+02:00",
+    "IsAdmin": 1,
+    "Playlists": []
+  },
+  {
+    "Id": 3,
+    "Name": "Jorge Ignacio",
+    "Username": "jigmam",
+    "Email": "jigman@gmail.com",
+    "Password": "2501",
+    "BirthDate": "2001-01-25T00:00:00",
+    "CreateDate": "2025-08-23T00:00:00+02:00",
+    "LastLogin": "2025-08-23T00:00:00+02:00",
+    "IsAdmin": 0,
+    "Playlists": []
+  }
+]
