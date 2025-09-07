@@ -3,6 +3,7 @@ namespace Utils;
 using Models;
 using Services;
 using Spectre.Console;
+using System.Globalization;
 using System.Threading;
 
 public class AlbumMenu
@@ -135,7 +136,25 @@ public class AlbumMenu
         }
 
         var Name = AnsiConsole.Ask<string>("Introduce el nombre del Album: ");
-        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento (mm/dd/aaaa): ");
+
+        var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Introduce la fecha de lanzamiento en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        var ReleaseDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
         Artist opcion = AnsiConsole.Prompt(
             new SelectionPrompt<Artist>()
                 .Title("[bold underline green] LISTA DE ARTISTAS[/]")
@@ -155,6 +174,8 @@ public class AlbumMenu
 
         };
         albumService.AddAlbum(album);
+        Thread.Sleep(200);
+        AnsiConsole.Clear();
     }
 
     //Modificar albúm
@@ -162,7 +183,24 @@ public class AlbumMenu
     {
         album.Name = AnsiConsole.Ask<string>("Nuevo nombre:", album.Name);
         album.Duration = AnsiConsole.Ask<int>("Nueva duración:", album.Duration);
-        album.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento (mm/dd/aaaa):", album.ReleaseDate);
+
+        var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Nueva fecha de lanzamiento en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        album.ReleaseDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
         album.SoftDelete = !AnsiConsole.Confirm("¿Activo?", !album.SoftDelete);
 
         albumService.UpdateAlbum(album);
