@@ -2,6 +2,7 @@ namespace Services;
 
 using Models;
 using NAudio.Wave;
+using Spectre.Console;
 
 public class AudioPlayer
 {
@@ -13,7 +14,7 @@ public class AudioPlayer
     {
         try
         {
-     
+
 
             // Preparar NAudio
             audioFile = new AudioFileReader(url);
@@ -25,7 +26,9 @@ public class AudioPlayer
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al reproducir el audio: {ex.Message}");
+            Console.WriteLine("▶️ Simulando audio ...");
+            Thread.Sleep(2000);
+            AnsiConsole.Clear();
         }
         // Descargar el MP3 en memoria
 

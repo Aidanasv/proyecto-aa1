@@ -1,7 +1,5 @@
 namespace Models;
 
-
-
 public class DataApiTracks
 {
     public string preview { get; set; }

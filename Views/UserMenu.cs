@@ -1,5 +1,6 @@
 namespace Views;
 
+using System.Globalization;
 using Models;
 using NAudio.CoreAudioApi;
 using Services;
@@ -30,7 +31,23 @@ public class UserMenu
             ValidPassword = AnsiConsole.Ask<string>("Introduce nuevamente tu contraseña: ");
         } while (Password != ValidPassword);
 
-        var BirthDate = AnsiConsole.Ask<DateTime>("Introduce tu fecha de nacimiento (mm/dd/aaaa): ");
+       var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Introduce una BirthDate en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        var BirthDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
 
         //todos los usuarios se inicializan en cliente, si no hay usuarios el primero es admin
         var role = 1;
@@ -87,7 +104,24 @@ public class UserMenu
         {
             ValidPassword = AnsiConsole.Ask<string>("Introduce nuevamente tu contraseña: ");
         } while (user.Password != ValidPassword);
-        user.BirthDate = AnsiConsole.Ask<DateTime>("Nuevo fecha de nacimiento (mm/dd/aaaa):", user.BirthDate);
+
+        var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Nueva fecha de nacimiento en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        user.BirthDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
 
         userService.UpdateUser(user);
         AnsiConsole.Clear();

@@ -1,5 +1,6 @@
 namespace Utils;
 
+using System.Globalization;
 using Models;
 using Services;
 using Spectre.Console;
@@ -174,12 +175,29 @@ public class TrackMenu
             Thread.Sleep(2000);
             AnsiConsole.Clear();
             return;
-        } 
-        
+        }
+
 
         var Name = AnsiConsole.Ask<string>("Introduce el nombre de la Canción: ");
         var Duration = AnsiConsole.Ask<int>("Introduce la duración de la Canción: ");
-        var ReleaseDate = AnsiConsole.Ask<DateTime>("Introduce la fecha de lanzamiento (mm/dd/aaaa): ");
+
+        var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Introduce la fecha de lanzamiento en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        var ReleaseDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
         AnsiConsole.WriteLine();
 
         Artist opcionArtist = AnsiConsole.Prompt(
@@ -236,7 +254,23 @@ public class TrackMenu
     {
         track.Name = AnsiConsole.Ask<string>("Nuevo nombre:", track.Name);
         track.Duration = AnsiConsole.Ask<int>("Nueva duración:", track.Duration);
-        track.ReleaseDate = AnsiConsole.Ask<DateTime>("Fecha de Lanzamiento (mm/dd/aaaa):", track.ReleaseDate);
+        var fecha = AnsiConsole.Prompt(
+            new TextPrompt<string>("Nueva fecha de lanzamiento en formato [yellow]dd-MM-yyyy[/]:")
+                .Validate(input =>
+                {
+                    return DateTime.TryParseExact(
+                        input,
+                        "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _)
+                        ? ValidationResult.Success()
+                        : ValidationResult.Error("[red]Formato inválido. Usa dd-MM-yyyy[/]");
+                })
+        );
+
+        // Convertimos el string validado a DateTime
+        track.ReleaseDate = DateTime.ParseExact(fecha, "dd-MM-yyyy", CultureInfo.InvariantCulture);
         track.SoftDelete = !AnsiConsole.Confirm("¿Activo?", !track.SoftDelete);
 
         trackService.UpdateTrack(track);
